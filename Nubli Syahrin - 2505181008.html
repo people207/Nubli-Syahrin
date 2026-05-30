@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grammar Detective — English Error Hunt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       BACKGROUND DECORATIONS
+  ════════════════════════════════════════════════ -->
+  <div class="bg-orb bg-orb--blue"  aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--purple" aria-hidden="true"></div>
+  <div class="bg-grid"              aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       TOAST NOTIFICATION
+  ════════════════════════════════════════════════ -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       COMBO BADGE
+  ════════════════════════════════════════════════ -->
+  <div class="combo-badge" id="combo-badge" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 1 — HOME
+  ════════════════════════════════════════════════ -->
+  <section class="screen active" id="screen-home" aria-label="Home">
+    <div class="home-wrap">
+
+      <span class="logo-pill">🔍 Grammar Detective</span>
+
+      <h1 class="home-title">Hunt the Error.<br />Master Grammar.</h1>
+
+      <p class="home-sub">
+        Read the sentence, then choose the option <strong>A / B / C / D</strong>
+        that correctly identifies &amp; fixes the grammar mistake. Beat the clock
+        and don't lose all your lives!
+      </p>
+
+      <!-- How to play cards -->
+      <div class="how-grid" aria-label="How to play">
+        <div class="how-card">
+          <div class="how-num">01</div>
+          <div class="how-text">Read the sentence &amp; find the error</div>
+        </div>
+        <div class="how-card">
+          <div class="how-num">02</div>
+          <div class="how-text">Pick the correct fix from A–D</div>
+        </div>
+        <div class="how-card">
+          <div class="how-num">03</div>
+          <div class="how-text">Score points &amp; climb the board</div>
+        </div>
+      </div>
+
+      <!-- Level selection -->
+      <div class="level-row" role="group" aria-label="Select difficulty">
+        <button class="level-btn active" data-level="easy"   onclick="selectLevel(this)">🌱 Easy</button>
+        <button class="level-btn"        data-level="medium" onclick="selectLevel(this)">⚡ Medium</button>
+        <button class="level-btn"        data-level="hard"   onclick="selectLevel(this)">🔥 Hard</button>
+      </div>
+
+      <!-- CTA buttons -->
+      <div class="home-cta">
+        <button class="btn-primary" onclick="startGame()">Start Detecting →</button>
+        <button class="btn-ghost"   onclick="showScreen('screen-lb')">🏆 Leaderboard</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 2 — GAME
+  ════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-game" aria-label="Game">
+    <div class="game-wrap">
+
+      <!-- HUD -->
+      <div class="hud" role="region" aria-label="Game status">
+        <div class="hud-card">
+          <div class="hud-label">Score</div>
+          <div class="hud-val hud-score" id="hud-score">0</div>
+        </div>
+        <div class="hud-card">
+          <div class="hud-label">Accuracy</div>
+          <div class="hud-val hud-acc" id="hud-acc">—</div>
+        </div>
+        <div class="hud-card">
+          <div class="hud-label">Level</div>
+          <div class="hud-val" id="hud-level">Easy</div>
+        </div>
+        <div class="hud-card hud-lives-card">
+          <div class="hud-label">Lives</div>
+          <div class="lives-row" id="hud-lives" aria-label="Lives remaining">
+            <span class="heart" id="heart-1" aria-label="Life 1">❤️</span>
+            <span class="heart" id="heart-2" aria-label="Life 2">❤️</span>
+            <span class="heart" id="heart-3" aria-label="Life 3">❤️</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timer bar -->
+      <div class="timer-wrap" aria-label="Time remaining">
+        <div class="timer-bar-bg">
+          <div class="timer-bar" id="timer-bar"></div>
+        </div>
+        <div class="timer-meta">
+          <span class="timer-label">Time</span>
+          <span class="timer-num" id="timer-num">30s</span>
+        </div>
+      </div>
+
+      <!-- Question card -->
+      <div class="question-card" id="question-card">
+        <div class="qcard-top">
+          <span class="q-type-tag" id="q-type">Subject-Verb Agreement</span>
+          <span class="q-counter"  id="q-counter">Q 1 / 10</span>
+        </div>
+
+        <p class="q-instruction">
+          The sentence below contains <strong>one grammar error</strong>.
+          Choose the option that correctly identifies and fixes it:
+        </p>
+
+        <!-- Sentence with error underlined -->
+        <div class="sentence-box" id="sentence-box" aria-live="polite"></div>
+
+        <!-- A / B / C / D choices -->
+        <div class="choices-grid" id="choices-grid" role="group" aria-label="Answer choices"></div>
+      </div>
+
+      <!-- Feedback panel -->
+      <div class="feedback-panel" id="feedback-panel" aria-live="polite">
+        <div class="feedback-title" id="feedback-title"></div>
+        <div class="feedback-body"  id="feedback-body"></div>
+        <div class="feedback-fix"   id="feedback-fix"></div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="game-footer">
+        <span class="progress-label" id="progress-label">0 correct · 0 wrong</span>
+        <div class="progress-bar-bg" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progress-bar-wrap">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <button class="btn-next" id="btn-next" style="display:none" onclick="nextQuestion()">
+          Next <span aria-hidden="true">→</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 3 — LEADERBOARD
+  ════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-lb" aria-label="Leaderboard">
+    <div class="lb-wrap">
+      <div class="lb-header">
+        <h2 class="lb-title">🏆 Leaderboard</h2>
+        <p class="lb-sub">Top Grammar Detectives — Local Hall of Fame</p>
+      </div>
+
+      <div class="lb-table" id="lb-table" role="list"></div>
+
+      <div class="lb-actions">
+        <button class="btn-primary" onclick="showScreen('screen-home')">← Back to Home</button>
+        <button class="btn-ghost"   onclick="clearLeaderboard()">Clear Scores</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       OVERLAY — GAME RESULT (win / game over)
+  ════════════════════════════════════════════════ -->
+  <div class="overlay" id="overlay-result" role="dialog" aria-modal="true" aria-label="Game result">
+    <div class="result-card" id="result-card">
+      <div class="result-emoji" id="r-emoji">🎉</div>
+      <h2 class="result-title"   id="r-title">Round Complete!</h2>
+      <p  class="result-sub"     id="r-sub"></p>
+
+      <div class="result-stats"  id="r-stats"></div>
+
+      <blockquote class="motivation" id="r-motivation"></blockquote>
+
+      <div class="result-btns"   id="r-btns"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — SAVE NAME
+  ════════════════════════════════════════════════ -->
+  <div class="modal" id="modal-name" role="dialog" aria-modal="true" aria-label="Save your score">
+    <div class="modal-card">
+      <h3 class="modal-title">🎯 Save Your Score</h3>
+      <p  class="modal-sub">Enter a name to appear on the leaderboard:</p>
+      <input
+        class="modal-input"
+        id="name-input"
+        type="text"
+        placeholder="Your name…"
+        maxlength="20"
+        aria-label="Player name"
+      />
+      <div class="modal-btns">
+        <button class="btn-primary" style="flex:1" onclick="saveName()">Save ✓</button>
+        <button class="btn-ghost"   style="padding:12px 18px" onclick="skipName()">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer" aria-label="Site footer">
+    <span class="footer-text">Created by</span>
+    <span class="footer-dot"></span>
+    <span class="footer-name">Nubli Syahrin</span>
+  </footer>
+
+</body>
+</html>
